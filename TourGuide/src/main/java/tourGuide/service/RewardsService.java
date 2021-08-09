@@ -1,6 +1,5 @@
 package tourGuide.service;
 
-import gpsUtil.GpsUtil;
 import gpsUtil.location.Attraction;
 import gpsUtil.location.Location;
 import gpsUtil.location.VisitedLocation;
@@ -20,11 +19,11 @@ public class RewardsService {
     private int defaultProximityBuffer = 10;
     private int proximityBuffer = defaultProximityBuffer;
     private int attractionProximityRange = 200;
-    private final GpsUtil gpsUtil;
+    private final GpsUtilService gpsUtilService;
     private final RewardCentral rewardsCentral;
 
-    public RewardsService(GpsUtil gpsUtil, RewardCentral rewardCentral) {
-        this.gpsUtil = gpsUtil;
+    public RewardsService(GpsUtilService gpsUtilService, RewardCentral rewardCentral) {
+        this.gpsUtilService = gpsUtilService;
         this.rewardsCentral = rewardCentral;
     }
 
@@ -38,17 +37,17 @@ public class RewardsService {
 
     public void calculateRewards(User user) {
         List<VisitedLocation> userLocations = new ArrayList<>(user.getVisitedLocations());
-        List<Attraction> attractions = gpsUtil.getAttractions();
+        List<Attraction> attractions = gpsUtilService.getAttractions();
 
         //On parcours les lieux visité par l'utilisateur
         for (VisitedLocation visitedLocation : userLocations) {
-        	//on parcours les lieux gps des attractions
+            //on parcours les lieux gps des attractions
             for (Attraction attraction : attractions) {
-            	// on regard si l'user à deja des reward sur cette attraction
+                // on regard si l'user à deja des reward sur cette attraction
                 if (user.getUserRewards().stream().filter(r -> r.attraction.attractionName.equals(attraction.attractionName)).count() == 0) {
-                	//on verifie que la position de l'utilisateur est proche de l'attractions
+                    //on verifie que la position de l'utilisateur est proche de l'attractions
                     if (nearAttraction(visitedLocation, attraction)) {
-						//on lui attribut le reward
+                        //on lui attribut le reward
                         user.addUserReward(new UserReward(visitedLocation, attraction, getRewardPoints(attraction, user)));
                     }
                 }
