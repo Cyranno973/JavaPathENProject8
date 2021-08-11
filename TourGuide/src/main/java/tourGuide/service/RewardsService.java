@@ -29,6 +29,10 @@ public class RewardsService {
         this.rewardCentralService = rewardCentralService;
     }
 
+    public void setAttractionProximityRange(int attractionProximityRange) {
+        this.attractionProximityRange = attractionProximityRange;
+    }
+
     public void setProximityBuffer(int proximityBuffer) {
         this.proximityBuffer = proximityBuffer;
     }
@@ -85,8 +89,12 @@ public class RewardsService {
 
     }
 
+    public boolean isWithinAttractionProximity(double distance) {
+        return distance <= attractionProximityRange;
+    }
+
     public boolean isWithinAttractionProximity(Attraction attraction, Location location) {
-        return getDistance(attraction, location) > attractionProximityRange ? false : true;
+        return isWithinAttractionProximity(getDistance(attraction, location));
     }
 
     private boolean nearAttraction(VisitedLocation visitedLocation, Attraction attraction) {
