@@ -62,6 +62,16 @@ public class TourGuideService {
         return internalUserMap.values().stream().collect(Collectors.toList());
     }
 
+    public Map<UUID, Location> getAllUsersLocations() {
+        Map<UUID, Location> userLocations = new HashMap<>();
+        for (User user : getAllUsers()) {
+            userLocations.put(user.getUserId(), Optional.ofNullable(user.getLastVisitedLocation())
+                    .map(visitedLocation -> visitedLocation.location)
+                    .orElse(null));
+        }
+        return userLocations;
+    }
+
     public void addUser(User user) {
         if (!internalUserMap.containsKey(user.getUserName())) {
             internalUserMap.put(user.getUserName(), user);
@@ -167,5 +177,4 @@ public class TourGuideService {
         LocalDateTime localDateTime = LocalDateTime.now().minusDays(new Random().nextInt(30));
         return Date.from(localDateTime.toInstant(ZoneOffset.UTC));
     }
-
 }
