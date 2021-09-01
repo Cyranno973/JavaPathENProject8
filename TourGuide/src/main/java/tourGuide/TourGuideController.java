@@ -68,7 +68,6 @@ public class TourGuideController {
     	return JsonStream.serialize(providers);
     }
 
-    @RequestMapping("/setUserPreferences")
     public String setUserPreferences(@RequestParam String userName, @RequestBody UserPreferences userPreferences) {
         return JsonStream.serialize(tourGuideService.setUserPreferences(getUser(userName), userPreferences));
     }
@@ -77,6 +76,7 @@ public class TourGuideController {
     public String getUserPreferences(@RequestParam String userName) {
         return JsonStream.serialize(tourGuideService.getUserPreferences(getUser(userName)));
     }
+
 
     private User getUser(String userName) {
     	return tourGuideService.getUser(userName);
