@@ -6,6 +6,7 @@ import java.util.UUID;
 
 import gpsUtil.location.Location;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
@@ -15,6 +16,7 @@ import com.jsoniter.output.JsonStream;
 import gpsUtil.location.VisitedLocation;
 import tourGuide.service.TourGuideService;
 import tourGuide.user.User;
+import tourGuide.user.UserPreferences;
 import tripPricer.Provider;
 
 @RestController
@@ -65,7 +67,17 @@ public class TourGuideController {
     	List<Provider> providers = tourGuideService.getTripDeals(getUser(userName));
     	return JsonStream.serialize(providers);
     }
-    
+
+    @RequestMapping("/setUserPreferences")
+    public String setUserPreferences(@RequestParam String userName, @RequestBody UserPreferences userPreferences) {
+        return JsonStream.serialize(tourGuideService.setUserPreferences(getUser(userName), userPreferences));
+    }
+
+    @RequestMapping("/getUserPreferences")
+    public String getUserPreferences(@RequestParam String userName) {
+        return JsonStream.serialize(tourGuideService.getUserPreferences(getUser(userName)));
+    }
+
     private User getUser(String userName) {
     	return tourGuideService.getUser(userName);
     }
