@@ -1,9 +1,9 @@
 package tourGuide;
 
 import gpsUtil.location.Attraction;
+import gpsUtil.location.Location;
 import gpsUtil.location.VisitedLocation;
 import org.junit.Test;
-import rewardCentral.RewardCentral;
 import tourGuide.helper.InternalTestHelper;
 import tourGuide.service.GpsUtilService;
 import tourGuide.service.RewardCentralService;
@@ -13,19 +13,20 @@ import tourGuide.user.User;
 import tripPricer.Provider;
 
 import java.util.List;
+import java.util.Map;
 import java.util.UUID;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.*;
+
 
 public class TestTourGuideService {
 
     @Test
     public void getUserLocation() {
-        GpsUtilService gpsUtil = new GpsUtilService();
-        RewardsService rewardsService = new RewardsService(gpsUtil, new RewardCentralService());
+        GpsUtilService gpsUtilService = new GpsUtilService();
+        RewardsService rewardsService = new RewardsService(gpsUtilService, new RewardCentralService());
         InternalTestHelper.setInternalUserNumber(0);
-        TourGuideService tourGuideService = new TourGuideService(gpsUtil, rewardsService);
+        TourGuideService tourGuideService = new TourGuideService(gpsUtilService, rewardsService);
 
         User user = new User(UUID.randomUUID(), "jon", "000", "jon@tourGuide.com");
         VisitedLocation visitedLocation = tourGuideService.trackUserLocation(user).join();
@@ -91,7 +92,6 @@ public class TestTourGuideService {
         assertEquals(user.getUserId(), visitedLocation.userId);
     }
 
-    // Not yet implemented
     @Test
     public void getNearbyAttractions() {
         GpsUtilService gpsUtilService = new GpsUtilService();
@@ -123,6 +123,21 @@ public class TestTourGuideService {
         tourGuideService.tracker.stopTracking();
 
         assertEquals(10, providers.size());
+    }
+
+    @Test
+    public void getAllUsersLocations() {
+        InternalTestHelper.setInternalUserNumber(5);
+        TourGuideService tourGuideService = new TourGuideService(null, null);
+
+        Map<UUID, Location> allUserLocations = tourGuideService.getAllUsersLocations();
+        assertEquals(5, allUserLocations.size());
+        for (Map.Entry<UUID, Location> entry : allUserLocations.entrySet()) {
+            UUID id = entry.getKey();
+            Location location = entry.getValue();
+            assertNotNull(id);
+            assertNotNull(location);
+        }
     }
 
 
