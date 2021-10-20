@@ -87,15 +87,34 @@ public class TourGuideService {
 
 
     public List<Attraction> getNearByAttractions(VisitedLocation visitedLocation) {
-        List<Attraction> nearbyAttractions = new ArrayList<>();
-        for (Attraction attraction : gpsUtilService.getAttractions()) {
-            if (rewardsService.isWithinAttractionProximity(attraction, visitedLocation.location)) {
-                nearbyAttractions.add(attraction);
+        return getNearByAttractions(visitedLocation, 5);
+    }
+
+    public List<Attraction> getNearByAttractions(VisitedLocation visitedLocation, int numberOfAttractions) {
+        // On collecte toutes les attractions proches
+        Map<Attraction, Double> nearbyAttractions = new HashMap<>();
+        List<Attraction> attractions = gpsUtilService.getAttractions();
+        if (numberOfAttractions >= attractions.size()) {
+            return attractions;
+        }
+        for (Attraction attraction : attractions) {
+            double distance = rewardsService.getDistance(attraction, visitedLocation.location);
+            if (rewardsService.isWithinAttractionProximity(distance)) {
+                nearbyAttractions.put(attraction, distance);
             }
         }
 
-        return nearbyAttractions;
+        return nearbyAttractions.entrySet()
+                .stream()
+                // on tri les attraction par distance
+                .sorted(Map.Entry.comparingByValue())
+                // on récupère l'attraction
+                .map(Map.Entry::getKey)
+                // on limit le nombre à retrouner
+                .limit(numberOfAttractions)
+                .collect(Collectors.toList());
     }
+
 
     private void addShutDownHook() {
         Runtime.getRuntime().addShutdownHook(new Thread() {

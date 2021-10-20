@@ -98,6 +98,7 @@ public class TestTourGuideService {
         RewardsService rewardsService = new RewardsService(gpsUtilService, new RewardCentralService());
         InternalTestHelper.setInternalUserNumber(0);
         TourGuideService tourGuideService = new TourGuideService(gpsUtilService, rewardsService);
+        rewardsService.setAttractionProximityRange(Integer.MAX_VALUE);
 
         User user = new User(UUID.randomUUID(), "jon", "000", "jon@tourGuide.com");
         VisitedLocation visitedLocation = tourGuideService.trackUserLocation(user).join();
