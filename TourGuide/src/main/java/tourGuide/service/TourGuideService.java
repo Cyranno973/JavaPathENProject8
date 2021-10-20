@@ -62,6 +62,16 @@ public class TourGuideService {
         return internalUserMap.values().stream().collect(Collectors.toList());
     }
 
+    public Map<UUID, Location> getAllUsersLocations() {
+        Map<UUID, Location> userLocations = new HashMap<>();
+        for (User user : getAllUsers()) {
+            userLocations.put(user.getUserId(), Optional.ofNullable(user.getLastVisitedLocation())
+                    .map(visitedLocation -> visitedLocation.location)
+                    .orElse(null));
+        }
+        return userLocations;
+    }
+
     public void addUser(User user) {
         if (!internalUserMap.containsKey(user.getUserName())) {
             internalUserMap.put(user.getUserName(), user);
@@ -84,7 +94,6 @@ public class TourGuideService {
                     return visitedLocation;
                 });
     }
-
 
     public List<Attraction> getNearByAttractions(VisitedLocation visitedLocation) {
         return getNearByAttractions(visitedLocation, 5);
@@ -114,7 +123,6 @@ public class TourGuideService {
                 .limit(numberOfAttractions)
                 .collect(Collectors.toList());
     }
-
 
     private void addShutDownHook() {
         Runtime.getRuntime().addShutdownHook(new Thread() {
