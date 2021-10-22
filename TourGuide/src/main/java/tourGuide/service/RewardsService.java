@@ -1,12 +1,12 @@
 package tourGuide.service;
 
-import gpsUtil.location.Attraction;
-import gpsUtil.location.Location;
-import gpsUtil.location.VisitedLocation;
 import org.springframework.stereotype.Service;
 import tourGuide.user.User;
 import tourGuide.user.UserReward;
-
+import tourGuide.proxy.gpsUtil.GpsUtilProxy;
+import tourGuide.proxy.gpsUtil.dto.Attraction;
+import tourGuide.proxy.gpsUtil.dto.Location;
+import tourGuide.proxy.gpsUtil.dto.VisitedLocation;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -21,10 +21,10 @@ public class RewardsService {
     private int defaultProximityBuffer = 10;
     private int proximityBuffer = defaultProximityBuffer;
     private int attractionProximityRange = 200;
-    private final GpsUtilService gpsUtilService;
+    private final GpsUtilProxy gpsUtilService;
     private final RewardCentralService rewardCentralService;
 
-    public RewardsService(GpsUtilService gpsUtilService, RewardCentralService rewardCentralService) {
+    public RewardsService(GpsUtilProxy gpsUtilService, RewardCentralService rewardCentralService) {
         this.gpsUtilService = gpsUtilService;
         this.rewardCentralService = rewardCentralService;
     }

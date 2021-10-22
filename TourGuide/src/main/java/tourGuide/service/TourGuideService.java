@@ -1,8 +1,9 @@
 package tourGuide.service;
 
-import gpsUtil.location.Attraction;
-import gpsUtil.location.Location;
-import gpsUtil.location.VisitedLocation;
+import tourGuide.proxy.gpsUtil.GpsUtilProxy;
+import tourGuide.proxy.gpsUtil.dto.Attraction;
+import tourGuide.proxy.gpsUtil.dto.Location;
+import tourGuide.proxy.gpsUtil.dto.VisitedLocation;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
@@ -24,13 +25,13 @@ import java.util.stream.IntStream;
 @Service
 public class TourGuideService {
     private Logger logger = LoggerFactory.getLogger(TourGuideService.class);
-    private final GpsUtilService gpsUtilService;
+    private final GpsUtilProxy gpsUtilService;
     private final RewardsService rewardsService;
     private final TripPricer tripPricer = new TripPricer();
     public final Tracker tracker;
     boolean testMode = true;
 
-    public TourGuideService(GpsUtilService gpsUtilService, RewardsService rewardsService) {
+    public TourGuideService(GpsUtilProxy gpsUtilService, RewardsService rewardsService) {
         this.gpsUtilService = gpsUtilService;
         this.rewardsService = rewardsService;
 

@@ -1,7 +1,7 @@
 package tourGuide.service;
 
-import gpsUtil.location.Attraction;
 import rewardCentral.RewardCentral;
+import tourGuide.proxy.gpsUtil.dto.Attraction;
 import tourGuide.user.User;
 
 import java.util.concurrent.CompletableFuture;

@@ -4,8 +4,8 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.UUID;
+import tourGuide.proxy.gpsUtil.dto.VisitedLocation;
 
-import gpsUtil.location.VisitedLocation;
 import tripPricer.Provider;
 
 public class User {

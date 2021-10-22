@@ -1,34 +1,57 @@
 package tourGuide;
 
-import gpsUtil.location.Attraction;
-import gpsUtil.location.Location;
-import gpsUtil.location.VisitedLocation;
+import java.util.*;
+import java.util.concurrent.CompletableFuture;
+
+
+import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Test;
+
+
+import org.mockito.Mockito;
+import rewardCentral.RewardCentral;
 import tourGuide.helper.InternalTestHelper;
-import tourGuide.service.GpsUtilService;
+import tourGuide.proxy.gpsUtil.GpsUtilProxy;
+import tourGuide.proxy.gpsUtil.dto.Attraction;
+import tourGuide.proxy.gpsUtil.dto.Location;
+import tourGuide.proxy.gpsUtil.dto.VisitedLocation;
 import tourGuide.service.RewardCentralService;
 import tourGuide.service.RewardsService;
 import tourGuide.service.TourGuideService;
 import tourGuide.user.User;
 import tripPricer.Provider;
 
-import java.util.List;
-import java.util.Map;
-import java.util.UUID;
-
 import static org.junit.Assert.*;
-
 
 public class TestTourGuideService {
 
+    GpsUtilProxy gpsUtilService = Mockito.mock(GpsUtilProxy.class);
+
+    @Before
+    public void init(){
+        List<Attraction> attractions = new ArrayList();
+        attractions.add(new Attraction("Disneyland", "Anaheim", "CA", 33.817595D, -117.922008D));
+        attractions.add(new Attraction("Jackson Hole", "Jackson Hole", "WY", 43.582767D, -110.821999D));
+        attractions.add(new Attraction("Mojave National Preserve", "Kelso", "CA", 35.141689D, -115.510399D));
+        attractions.add(new Attraction("Joshua Tree National Park", "Joshua Tree National Park", "CA", 33.881866D, -115.90065D));
+        attractions.add(new Attraction("Buffalo National River", "St Joe", "AR", 35.985512D, -92.757652D));
+        attractions.add(new Attraction("Hot Springs National Park", "Hot Springs", "AR", 34.52153D, -93.042267D));
+        Mockito.when(gpsUtilService.getAttractions()).thenReturn(attractions);
+    }
+
     @Test
     public void getUserLocation() {
-        GpsUtilService gpsUtilService = new GpsUtilService();
         RewardsService rewardsService = new RewardsService(gpsUtilService, new RewardCentralService());
         InternalTestHelper.setInternalUserNumber(0);
         TourGuideService tourGuideService = new TourGuideService(gpsUtilService, rewardsService);
 
         User user = new User(UUID.randomUUID(), "jon", "000", "jon@tourGuide.com");
+        Attraction attraction = gpsUtilService.getAttractions().get(0);
+        user.addToVisitedLocations(new VisitedLocation(user.getUserId(), attraction, new Date()));
+
+        Mockito.when(gpsUtilService.getUserLocation(user)).thenReturn(CompletableFuture.completedFuture(user.getLastVisitedLocation()));
+
         VisitedLocation visitedLocation = tourGuideService.trackUserLocation(user).join();
         tourGuideService.tracker.stopTracking();
         assertTrue(visitedLocation.userId.equals(user.getUserId()));
@@ -36,7 +59,6 @@ public class TestTourGuideService {
 
     @Test
     public void addUser() {
-        GpsUtilService gpsUtilService = new GpsUtilService();
         RewardsService rewardsService = new RewardsService(gpsUtilService, new RewardCentralService());
         InternalTestHelper.setInternalUserNumber(0);
         TourGuideService tourGuideService = new TourGuideService(gpsUtilService, rewardsService);
@@ -58,7 +80,6 @@ public class TestTourGuideService {
 
     @Test
     public void getAllUsers() {
-        GpsUtilService gpsUtilService = new GpsUtilService();
         RewardsService rewardsService = new RewardsService(gpsUtilService, new RewardCentralService());
         InternalTestHelper.setInternalUserNumber(0);
         TourGuideService tourGuideService = new TourGuideService(gpsUtilService, rewardsService);
@@ -79,12 +100,15 @@ public class TestTourGuideService {
 
     @Test
     public void trackUser() {
-        GpsUtilService gpsUtilService = new GpsUtilService();
         RewardsService rewardsService = new RewardsService(gpsUtilService, new RewardCentralService());
         InternalTestHelper.setInternalUserNumber(0);
         TourGuideService tourGuideService = new TourGuideService(gpsUtilService, rewardsService);
 
         User user = new User(UUID.randomUUID(), "jon", "000", "jon@tourGuide.com");
+        Attraction attraction = gpsUtilService.getAttractions().get(0);
+        user.addToVisitedLocations(new VisitedLocation(user.getUserId(), attraction, new Date()));
+        Mockito.when(gpsUtilService.getUserLocation(user)).thenReturn(CompletableFuture.completedFuture(user.getLastVisitedLocation()));
+
         VisitedLocation visitedLocation = tourGuideService.trackUserLocation(user).join();
 
         tourGuideService.tracker.stopTracking();
@@ -92,15 +116,19 @@ public class TestTourGuideService {
         assertEquals(user.getUserId(), visitedLocation.userId);
     }
 
+    // Not yet implemented
     @Test
     public void getNearbyAttractions() {
-        GpsUtilService gpsUtilService = new GpsUtilService();
         RewardsService rewardsService = new RewardsService(gpsUtilService, new RewardCentralService());
         InternalTestHelper.setInternalUserNumber(0);
         TourGuideService tourGuideService = new TourGuideService(gpsUtilService, rewardsService);
         rewardsService.setAttractionProximityRange(Integer.MAX_VALUE);
 
         User user = new User(UUID.randomUUID(), "jon", "000", "jon@tourGuide.com");
+        Attraction attraction = gpsUtilService.getAttractions().get(0);
+        user.addToVisitedLocations(new VisitedLocation(user.getUserId(), attraction, new Date()));
+        Mockito.when(gpsUtilService.getUserLocation(user)).thenReturn(CompletableFuture.completedFuture(user.getLastVisitedLocation()));
+
         VisitedLocation visitedLocation = tourGuideService.trackUserLocation(user).join();
 
         List<Attraction> attractions = tourGuideService.getNearByAttractions(visitedLocation);
@@ -110,8 +138,8 @@ public class TestTourGuideService {
         assertEquals(5, attractions.size());
     }
 
+
     public void getTripDeals() {
-        GpsUtilService gpsUtilService = new GpsUtilService();
         RewardsService rewardsService = new RewardsService(gpsUtilService, new RewardCentralService());
         InternalTestHelper.setInternalUserNumber(0);
         TourGuideService tourGuideService = new TourGuideService(gpsUtilService, rewardsService);
@@ -130,9 +158,11 @@ public class TestTourGuideService {
         InternalTestHelper.setInternalUserNumber(5);
         TourGuideService tourGuideService = new TourGuideService(null, null);
 
-        Map<UUID, Location> allUserLocations = tourGuideService.getAllUsersLocations();
-        assertEquals(5, allUserLocations.size());
-        for (Map.Entry<UUID, Location> entry : allUserLocations.entrySet()) {
+        Map<UUID, Location> allUsersLocations = tourGuideService.getAllUsersLocations();
+        assertEquals(5, allUsersLocations.size());
+
+        for (Map.Entry<UUID, Location> entry : allUsersLocations.entrySet()) {
+
             UUID id = entry.getKey();
             Location location = entry.getValue();
             assertNotNull(id);
