@@ -50,6 +50,7 @@ public class TestPerformance {
 
     GpsUtilProxy gpsUtilService = Mockito.mock(GpsUtilProxy.class);
 
+//    @Ignore
 	@Test
 	public void highVolumeTrackLocation() {
 		RewardsService rewardsService = new RewardsService(gpsUtilService, new RewardCentralService());
@@ -70,7 +71,7 @@ public class TestPerformance {
 		assertTrue(TimeUnit.MINUTES.toSeconds(15) >= TimeUnit.MILLISECONDS.toSeconds(stopWatch.getTime()));
 	}
 
-
+//	@Ignore
 	@Test
 	public void highVolumeGetRewards() {
 		RewardsService rewardsService = new RewardsService(gpsUtilService, new RewardCentralService());
